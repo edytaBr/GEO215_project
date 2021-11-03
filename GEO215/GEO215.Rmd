@@ -1,0 +1,54 @@
+---
+title: |
+  | **GEO215**
+  |
+  | Mandatory Assignment 
+  |
+  | *Multi Criteria Evaluation*
+author: |
+        |
+        | Candidate no. 146
+        |
+        | ![](logo.png){width=1in}  
+
+date: "20/10/2021"
+output: pdf_document
+bibliography: reference.bib
+
+fontsize: 12pt
+
+linestretch: 1.5
+geometry: margin=2.5cm
+
+---
+\newpage 
+
+```{r setup, echo=FALSE, results='show'}
+
+pop = read.table("BrannSta_250m_pop_buffer_2km_mean.txt", header = TRUE, sep = ";", dec = ",")
+boliger = read.table("BrannSta_250m_boliger_buffer_2km_mean.txt", header = TRUE, sep = ";", dec = ",")
+
+barplot(pop$MEAN, main='Mean population within 2km from Fire station',
+        xlab="Fire station", ylab ="Population", col = "Lightblue", ylim = (c(0, 400)), names.arg = pop$brannstasj, cex.names = 0.6)
+
+
+
+barplot(boliger$MEAN, main='Mean number of buildings within 2km from Fire station',
+        xlab="Fire station", ylab ="Population", col = "Lightblue", ylim = (c(0, 12)), names.arg = boliger$brannstasj, cex.names = 0.6)
+
+pop_table = pop[, c(2,6)]
+pop_table$MEAN <- round(pop_table$MEAN)
+colnames(pop_table) <- c("Fire station", "Mean population")
+knitr::kable(head(pop_table), "simple", caption = "Mean population within 2km from Fire station")
+
+boliger_table = boliger[, c(2,6)]
+boliger_table$MEAN <- round(boliger_table$MEAN)
+
+colnames(boliger_table) <- c("Fire station", "Mean number of buildings")
+knitr::kable(head(boliger_table), "simple",  caption = "Mean number of buildings within 2km from Fire station")
+
+```
+
+\listoftables
+
+
