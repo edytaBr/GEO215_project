@@ -14,6 +14,8 @@ author: |
 date: "20/10/2021"
 output: pdf_document
 bibliography: reference.bib
+header-includes:
+   - \usepackage{subfig}
 
 fontsize: 12pt
 
@@ -23,32 +25,231 @@ geometry: margin=2.5cm
 ---
 \newpage 
 
+# 1. Introduction
+This analysis will consider the site selection for new fire station in Bergen. This is one of crucial question which decision makers have to answer due to potential risk of fires and its danger on society. In worst case scenario it can lead to loss of lives and properties and can lead to  state of emergency in the city. 
+
+This is one of the topic in emergency service location selection and there are many studies for selecting optimumlocation such as simple selections done in terms of rudimentary calculation, past experience, or even predilection. \footnote {https://www.isprs.org/proceedings/2011/gi4dm/pdf/op80.pdf}  
+
+In this assignment more sophisticated tools will be implemented, which make use of statistical and mathematical tools with accompany of Geographic Information Systems (GIS). This will help to select the suitable location/area to establish a new fire station in Bergen, Vestland. 
+
+# 2. Methods and material
+
+**Bergen_250m_SBB**\
+- *Fotmat*: vector\
+- *Source*: GEO215 lab. Originally from https://kart.ssb.no/ \
+- *Description*: This dataset is vector grid, and each cell is 250 by 250m. This is a national grid that SSB (Statistics Norway). 
+
+
+**Bergen_bydel**\
+- *Fotmat*: vector\
+- *Source*: GEO215 data lab\
+- *Description*: Polygons of urban districts (bydeler) in Bergen. Made by merging grunnkrets 
+
+
+**Vbase**\
+- *Fotmat*: vector\
+- *Source*: https://kartkatalog.geonorge.no/ \
+- *Description*: Roads in Vestland Fylkeskommune. Data were clipped to border of Bergen city (roads_bergen.shp) 
+
+
+**Brannstasjoner**\
+- *Fotmat*: gml\
+- *Source*: https://kartkatalog.geonorge.no/ \
+- *Description*: Localizations of fire stations in Bergen. Data in gml format were converted to .shp in Linux command line.
+
+
+**Befolkning**\
+- *Fotmat*: csv\
+- *Source*: https://kart.ssb.no/ with ‘utvalg’ \
+- *Description*: Population data: number of people living in 250x250m cell. Dataset was connected to Bergen_250m_SSB by Join field in ArcGis Pro. Bergen_250m_pop_2019 
+
+
+**Student_housing**\
+- *Fotmat*: gml\
+- *Source*: https://earth.google.com/
+- *Description*: Localizations of student housings in Bergen, manually digitized in Google Earth and exported as .kml file, converted to .shp in by using online converter mygeodata.cloud 
+
+
+**Kulturminner - Brannsmitteområder** \
+- *Fotmat*: gml\
+- *Source*: https://kart.ssb.no/ \
+- *Description*: Dataset with polygons presenting special cultural areas that are vulnerable for fast spreading of fire. Usually wooden buildings. Data in gml format were converted to .shp in by using online converter mygeodata.cloud.  
+
+
+Include description of how and why you decided the scaling and weights applied and also which weights you selected for the different criteria (e.g. as a table).
+
+
+\newpage
+
+### Weighted overlay
+
+The number and placement of fire stations in the city is usually based on the distance between stations, the population served, and the hazards at particular locations. It is crucial to minimize total travel time as well. 
+In this study the **Weighted Overlay** was used and its uses following methods:
+
+- each raster layer is assigned a weight (higher value means that this factor is more significant for decision)
+
+- values in raster are then reclassified to a common suitability scale
+
+- raster values are overlayed
+
+- each raster cells suitability value is multiplied by its layer weight (Tab.2) rasters value, and then sum of all cells are summed up as an output layer and final map. \footnote{https://www.esri.com/about/newsroom/wp-content/uploads/2019/05/understanding-weighted-overlay.pdf}
+
+Since weighted overlay takes rasters data as an input, there were several operations conducted to obtain  6 input raster layers (Fig. 1). Workflow is presented on Fig. 2 and described in the next subsection. 
+
+#### **Rasters reclassification**\
+*Fire hazard areas*
+
+Bergen is known from its wooden architecture it has to be the main factor in localization of new fire stations. It is known from the past that many fires (in 1955), have ravaged the characteristic wooden houses of Bryggen. The obtained data from geonorge.no presenting fire hazards objects in Bergen allowed to define euclidean distance from polygon layer and reclassified it to suitable classes. Areas within 2 km distance from fire hazards objects are considered as areas where we should consider to build new fire station unit.
+
+*Existing fire stations*
+
+Since it is important that model is taking under consideration existing infrastructure, areas close to existing stations were reclassified (Tab. 1) according to calculated euclidean distance from fire station units. In the literature is is assumed that at a bare minimum, a fire station should be placed so that every part of the jurisdiction is within 5 miles (approx 8km) of a fire station and anything beyond 5 miles is considered as no recognized fire protection. \footnote{https://emergencyreporting.com/blog/evaluating-fire-station-locations/}. Bergen is different city, and according to current measurements distances between fire stations are presented in Table 3. Thus the 3.5 distance is considered to have value 0 ( it is not desired to build fire station there). 
+
+
+*Population and buildings* 
+
+Population and buildings layer are reclassified into 3 classes. They were divided according to the equal intervals. The higher values got higher significance in further analysis. This is confirmed by Fig. 1 and Table 1 and 2, where sum of population and buildings are summarized within 2 km distance from existing fire stations. It confirms as well that population and urban areas are for fire station placement. These two layers have gotten the same weight since they are correlated and according to statistics,  human ignition is to blame for 84% of all wildfires (in USA), and 97% of all those that threaten homes. \footnote{https://www.science.org/content/article/human-sparked-wildfires-are-more-destructive-those-caused-nature}.  
+
+```{r fig-sub, echo = FALSE, fig.cap='Number of people and buildings from existing fire stations within 2km distance', fig.subcap=c('Population', 'Buildings'), out.width='.49\\linewidth', fig.asp=1, fig.ncol = 2}
+pop = read.table("BrannSta_250m_pop_buffer_2km_mean.txt", header = TRUE, sep = ";", dec = ",")
+data = read.table("data1.txt", header = TRUE, sep = ",", dec = ",")
+
+
+boliger = read.table("BrannSta_250m_boliger_buffer_2km_mean.txt", header = TRUE, sep = ";", dec = ",")
+
+barplot(pop$MEAN, main='Number of people within 2km from Fire station',
+        xlab="Fire station", ylab ="Population", col = "Lightblue", ylim = (c(0, 400)), names.arg = pop$brannstasj, cex.names = 0.8)
+
+
+
+barplot(boliger$MEAN, main='Number of buildings within 2km from Fire station',
+        xlab="Fire station", ylab ="Population", col = "Lightblue", ylim = (c(0, 12)), names.arg = boliger$brannstasj, cex.names = 0.8)
+```
+
 ```{r setup, echo=FALSE, results='show'}
 
 pop = read.table("BrannSta_250m_pop_buffer_2km_mean.txt", header = TRUE, sep = ";", dec = ",")
+data = read.table("data1.txt", header = TRUE, sep = ",", dec = ",")
+
+
 boliger = read.table("BrannSta_250m_boliger_buffer_2km_mean.txt", header = TRUE, sep = ";", dec = ",")
-
-barplot(pop$MEAN, main='Mean population within 2km from Fire station',
-        xlab="Fire station", ylab ="Population", col = "Lightblue", ylim = (c(0, 400)), names.arg = pop$brannstasj, cex.names = 0.6)
-
-
-
-barplot(boliger$MEAN, main='Mean number of buildings within 2km from Fire station',
-        xlab="Fire station", ylab ="Population", col = "Lightblue", ylim = (c(0, 12)), names.arg = boliger$brannstasj, cex.names = 0.6)
 
 pop_table = pop[, c(2,6)]
 pop_table$MEAN <- round(pop_table$MEAN)
 colnames(pop_table) <- c("Fire station", "Mean population")
-knitr::kable(head(pop_table), "simple", caption = "Mean population within 2km from Fire station")
+knitr::kable(head(pop_table), "simple", caption = "Mean population within 2km from Fire station.")
 
 boliger_table = boliger[, c(2,6)]
 boliger_table$MEAN <- round(boliger_table$MEAN)
 
 colnames(boliger_table) <- c("Fire station", "Mean number of buildings")
-knitr::kable(head(boliger_table), "simple",  caption = "Mean number of buildings within 2km from Fire station")
+knitr::kable(head(boliger_table), "simple",  caption = "Mean number of buildings within 2km from Fire station.")
 
 ```
 
+
+*Roads proximity*
+
+The distance to transport infrastructure is based as well on euclidean distance and has a value range from 0 to 1000 m that indicates distance values from the road segments in meters. It is assumed that up to 500m it is more suitable to build fire station (Tab. 1).
+
+\newpage
+*Student housing*
+
+It is commonly know that there are many fire alarms in student houses. This is happening often and according to own experience the fire station unit should be located in close distance. It is not the most important factor to get final result, but it should have had reflection in fire station placement localization. The euclidean distance from student houses is divided into two classes by manual interval (Tab 1). 
+
+\setstretch{0.5}
+\small
+
+| **Reclassification**      	|                   	|
+|-----------------------------	|-------------------	|
+| **Distance to the road [km]**       	|                   	|
+| *Value*                  	| *Reclass Value* 	|
+| $\leq$ 0.5                	| 2                 	|
+| $\leq$ 1                 	| 1                 	|
+| **Distance to the fire station [km]** 	|                   	|
+| *Value*                  	| *Reclass Value* 	|
+| $\leq$ 3.5                 	| 0                 	|
+| $\leq$ 7                 	| 1                 	|
+| $\leq$ 10.5                	| 2                 	|
+| $\leq$ 14                	| 3                 	|
+| **Buildings [number]**                	|                   	|
+| *Value*                   	| *Reclass Value* 	|
+| $\leq$ 25                   	| 1                 	|
+| $\leq$ 50                   	| 2                 	|
+| $\leq$ 75                   	| 3                 	|
+| **Population [number]**                 	|                   	|
+| *Value*                   	| *Reclass Value* 	|
+| $\leq$ 500                  	| 1                 	|
+| $\leq$ 1000                 	| 2                 	|
+| $\leq$ 1500                 	| 3                 	|
+| **Student Housing [km]**            	|                   	|
+| *Value*                   	| *Reclass Value* 	|
+| $\leq$ 5                 	| 1                 	|
+| $\leq$ 28                	| 0                 	|
+| **Fire hazards objects [km]**      	|                   	|
+| *Value*                   	| *Reclass Value* 	|
+| $\leq$ 2                 	| 1                 	|
+| $\leq$ 31                	| 0                 	|
+Table: Reclassification values for raster layers.
+
+\newpage
+
+### Weights
+
+| Layer	| Weight [%]	|
+|-----------------------------	|-------------------	|
+| **Fire hazards areas**	| 35	|
+| **Distance to existing stations**	| 25	|
+| **Buildings**	| 15 	|
+| **Population** |  15 |
+|	**Roads** | 5	|
+| **Student housing** |	5 |
+Table: Weights used in Weighted Overlay.
+
+\begin{figure}
+\setstretch{0.5}
+\scriptsize
+    \includegraphics[width=8cm,height = 7cm]{Layout_buildings_clip.png}
+    \includegraphics[width=8cm,height = 7cm]{Layout_population_clip.png}
+    \caption{Building and population reclassifictaion.}
+    \includegraphics[width=8cm,height = 7cm]{Layout_stasjoner_clip.png}
+    \includegraphics[width=8cm,height = 7cm]{Layout_fire_hazards_clip.png}
+    \caption{Distance to existing fire stations and distance to fire hazards
+    areas.}
+    \includegraphics[width=8cm,height = 7cm]{Layout_roads_clip.png}
+    \includegraphics[width=8cm,height = 7cm]{Layout_Student_housing_clip.png}
+    \caption{Distance to student housing and distance to roads.}
+\end{figure}
+
+\normalsize
+\newpage 
+\begin{figure}
+\setstretch{0.5}
+    \includegraphics[keepaspectratio=false, width=14cm,height = 23cm]{Brann.png}
+    \caption{Flowchart.}
+\end{figure}
+
+\newpage
+# 3. Results
+
+
+
+
+4. Discussion
+\newpage 
+
+# References 
+\newpage 
+
+
+
+
+
+
+
+
+
+
+
+
 \listoftables
-
-
