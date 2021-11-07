@@ -103,34 +103,25 @@ Bergen is known from its wooden architecture it has to be the main factor in loc
 
 *Existing fire stations*
 
-Since it is important that model is taking under consideration existing infrastructure, areas close to existing stations were reclassified (Tab. 1) according to calculated euclidean distance from fire station units. In the literature is is assumed that at a bare minimum, a fire station should be placed so that every part of the jurisdiction is within 5 miles (approx 8km) of a fire station and anything beyond 5 miles is considered as no recognized fire protection. \footnote{https://emergencyreporting.com/blog/evaluating-fire-station-locations/}. Bergen is different city, and according to current measurements distances between fire stations are presented in Table 3. Thus the 3.5 distance is considered to have value 0 ( it is not desired to build fire station there). 
+Since it is important that model is taking under consideration existing infrastructure, areas close to existing stations were reclassified (Tab. 1) according to calculated euclidean distance from fire station units. In the literature is is assumed that at a bare minimum, a fire station should be placed so that every part of the jurisdiction is within 5 miles (approx 8km) of a fire station and anything beyond 5 miles is considered as no recognized fire protection. \footnote{https://emergencyreporting.com/blog/evaluating-fire-station-locations/}. Bergen is a different city, and according to current measurements distances between fire stations are presented in Table 1. In this research the 3.5 distance is considered to have value 0 (it is not desired to build fire station there). 
 
+| Fire Station   	| Nearest Fire station 	| Distance [km] 	|
+|----------------	|----------------------	|---------------	|
+| Hovedstasjonen 	| Sandviken            	| 2,4           	|
+| Arna           	| Sandviken            	| 8,4           	|
+| Fana           	| Hovedstasjonen       	| 5,5           	|
+| Laksevåg       	| Fana                 	| 6,1           	|
+| Sandviken      	| Hovedstasjonen       	| 2,4           	|
+| Åsane          	| Sandviken            	| 6,4           	|
+
+Table: Distance to nearest fire station [km].
 
 *Population and buildings* 
-
-Population and buildings layer are reclassified into 3 classes. They were divided according to the equal intervals. The higher values got higher significance in further analysis. This is confirmed by Fig. 1 and Table 1 and 2, where sum of population and buildings are summarized within 2 km distance from existing fire stations. It confirms as well that population and urban areas are for fire station placement. These two layers have gotten the same weight since they are correlated and according to statistics,  human ignition is to blame for 84% of all wildfires (in USA), and 97% of all those that threaten homes. \footnote{https://www.science.org/content/article/human-sparked-wildfires-are-more-destructive-those-caused-nature}.  
-
-```{r fig-sub, echo = FALSE, fig.cap='Number of people and buildings from existing fire stations within 2km distance', fig.subcap=c('Population', 'Buildings'), out.width='.49\\linewidth', fig.asp=1, fig.ncol = 2}
-pop = read.table("BrannSta_250m_pop_buffer_2km_mean.txt", header = TRUE, sep = ";", dec = ",")
-data = read.table("data1.txt", header = TRUE, sep = ",", dec = ",")
-
-
-boliger = read.table("BrannSta_250m_boliger_buffer_2km_mean.txt", header = TRUE, sep = ";", dec = ",")
-
-barplot(pop$MEAN, main='Number of people within 2km from Fire station',
-        xlab="Fire station", ylab ="Population", col = "Lightblue", ylim = (c(0, 400)), names.arg = pop$brannstasj, cex.names = 0.8)
-
-
-
-barplot(boliger$MEAN, main='Number of buildings within 2km from Fire station',
-        xlab="Fire station", ylab ="Population", col = "Lightblue", ylim = (c(0, 12)), names.arg = boliger$brannstasj, cex.names = 0.8)
-```
 
 ```{r setup, echo=FALSE, results='show'}
 
 pop = read.table("BrannSta_250m_pop_buffer_2km_mean.txt", header = TRUE, sep = ";", dec = ",")
 data = read.table("data1.txt", header = TRUE, sep = ",", dec = ",")
-
 
 boliger = read.table("BrannSta_250m_boliger_buffer_2km_mean.txt", header = TRUE, sep = ";", dec = ",")
 
@@ -145,6 +136,23 @@ boliger_table$MEAN <- round(boliger_table$MEAN)
 colnames(boliger_table) <- c("Fire station", "Mean number of buildings")
 knitr::kable(head(boliger_table), "simple",  caption = "Mean number of buildings within 2km from Fire station.")
 
+```
+
+
+Population and buildings layer are reclassified into 3 classes. They were divided according to the equal intervals. The higher values got higher significance in further analysis. This is confirmed by Fig. 1 and Table 1 and 2, where sum of population and buildings are summarized within 2 km distance from existing fire stations. It confirms as well that population and urban areas are important for fire station placement. These two layers have gotten the same weight since they are correlated and according to statistics,  human ignition is to blame for 84% of all wildfires (in USA), and 97% of all those that threaten homes. \footnote{https://www.science.org/content/article/human-sparked-wildfires-are-more-destructive-those-caused-nature}.  
+
+```{r fig-sub, echo = FALSE, fig.cap='Number of people and buildings from existing fire stations within 2km distance', fig.subcap=c('Population', 'Buildings'), out.width='.49\\linewidth', fig.asp=1, fig.ncol = 2}
+pop = read.table("BrannSta_250m_pop_buffer_2km_mean.txt", header = TRUE, sep = ";", dec = ",")
+data = read.table("data1.txt", header = TRUE, sep = ",", dec = ",")
+
+
+boliger = read.table("BrannSta_250m_boliger_buffer_2km_mean.txt", header = TRUE, sep = ";", dec = ",")
+
+barplot(pop$MEAN, main='Number of people within 2km from Fire station',
+        xlab="Fire station", ylab ="Population", col = "Lightblue", ylim = (c(0, 45000)), names.arg = pop$brannstasj, cex.names = 0.8)
+
+barplot(boliger$MEAN, main='Number of buildings within 2km from Fire station',
+        xlab="Fire station", ylab ="Buildings", col = "Lightblue", ylim = (c(0, 650)), names.arg = boliger$brannstasj, cex.names = 0.8)
 ```
 
 
@@ -225,7 +233,7 @@ Table: Weights used in Weighted Overlay.
 \newpage 
 \begin{figure}
 \setstretch{0.5}
-    \includegraphics[keepaspectratio=false, width=14cm,height = 23cm]{Brann.png}
+    \includegraphics[keepaspectratio=false, width=14cm,height = 22cm]{Brann.png}
     \caption{Flowchart.}
 \end{figure}
 
