@@ -28,11 +28,15 @@ geometry: margin=2.5cm
 # 1. Introduction
 This analysis will consider the site selection for new fire station in Bergen. This is one of crucial question which decision makers have to answer due to potential risk of fires and its danger on society. In worst case scenario it can lead to loss of lives and properties and can lead to  state of emergency in the city. 
 
-This is one of the topic in emergency service location selection and there are many studies for selecting optimumlocation such as simple selections done in terms of rudimentary calculation, past experience, or even predilection. \footnote {https://www.isprs.org/proceedings/2011/gi4dm/pdf/op80.pdf}  
+This is one of the topic in emergency service location selection and there are many studies for selecting optimum location such as simple selections done in terms of rudimentary calculation, past experience, or even predilection. \footnote {https://www.isprs.org/proceedings/2011/gi4dm/pdf/op80.pdf}  
 
-In this assignment more sophisticated tools will be implemented, which make use of statistical and mathematical tools with accompany of Geographic Information Systems (GIS). This will help to select the suitable location/area to establish a new fire station in Bergen, Vestland. 
+In this assignment more sophisticated tools will be implemented, which make use of statistical and mathematical tools with accompany of Geographic Information Systems (GIS). This will help to produce suitability map to select preferable location/area to establish a new fire station in Bergen, Vestland. 
 
 # 2. Methods and material
+
+### Data
+
+The data used in this assignment are listed below with detailed information about conversion and format. Some of them were converted by using online converter and command line in Linux. It is decided to use data in 250 x 250m resolution and in EUREF89 UTM sone 33, 2d projection. 
 
 **Bergen_250m_SBB**\
 - *Fotmat*: vector\
@@ -43,31 +47,31 @@ In this assignment more sophisticated tools will be implemented, which make use 
 **Bergen_bydel**\
 - *Fotmat*: vector\
 - *Source*: GEO215 data lab\
-- *Description*: Polygons of urban districts (bydeler) in Bergen. Made by merging grunnkrets 
+- *Description*: Polygons of urban districts (bydeler) in Bergen. Made by merging grunnkrets.
 
 
 **Vbase**\
 - *Fotmat*: vector\
 - *Source*: https://kartkatalog.geonorge.no/ \
-- *Description*: Roads in Vestland Fylkeskommune. Data were clipped to border of Bergen city (roads_bergen.shp) 
+- *Description*: Roads in Vestland Fylkeskommune. Data were clipped to border of Bergen city (`roads_bergen.shp`).
 
 
 **Brannstasjoner**\
 - *Fotmat*: gml\
 - *Source*: https://kartkatalog.geonorge.no/ \
-- *Description*: Localizations of fire stations in Bergen. Data in gml format were converted to .shp in Linux command line.
+- *Description*: Localization of fire stations in Bergen. Data in `.gml` format were converted to `.shp` in Linux command line.
 
 
 **Befolkning**\
 - *Fotmat*: csv\
-- *Source*: https://kart.ssb.no/ with ‘utvalg’ \
-- *Description*: Population data: number of people living in 250x250m cell. Dataset was connected to Bergen_250m_SSB by Join field in ArcGis Pro. Bergen_250m_pop_2019 
+- *Source*: https://kart.ssb.no/ with "utvalg" - manually defined shape that was used as data selection border \
+- *Description*: Population data: number of people living in one cell (resolution 250x250m). Dataset was connected to Bergen_250m_SSB by `Join field` in ArcGis Pro. 
 
 
 **Student_housing**\
 - *Fotmat*: gml\
 - *Source*: https://earth.google.com/
-- *Description*: Localizations of student housings in Bergen, manually digitized in Google Earth and exported as .kml file, converted to .shp in by using online converter mygeodata.cloud 
+- *Description*: Localizations of student housings in Bergen, manually digitized in Google Earth and exported as `.kml` file, converted to `.shp` in by using online converter mygeodata.cloud.
 
 
 **Kulturminner - Brannsmitteområder** \
@@ -76,34 +80,51 @@ In this assignment more sophisticated tools will be implemented, which make use 
 - *Description*: Dataset with polygons presenting special cultural areas that are vulnerable for fast spreading of fire. Usually wooden buildings. Data in gml format were converted to .shp in by using online converter mygeodata.cloud.  
 
 
-Include description of how and why you decided the scaling and weights applied and also which weights you selected for the different criteria (e.g. as a table).
-
-
-\newpage
 
 ### Weighted overlay
 
-The number and placement of fire stations in the city is usually based on the distance between stations, the population served, and the hazards at particular locations. It is crucial to minimize total travel time as well. 
-In this study the **Weighted Overlay** was used and its uses following methods:
+The number and placement of fire stations in the city is usually based on the distance between stations, the population served, and the hazards at particular locations. It is crucial to minimize total travel time so that the response is as fast as possible.  
+In this study the **Weighted Overlay** (WO) was used and its uses following steps to obtain the final suitability map:
 
-- each raster layer is assigned a weight (higher value means that this factor is more significant for decision)
+- each raster layer is assigned a weight (higher value means that this factor is more significant for decision) (Tab. 1)
 
 - values in raster are then reclassified to a common suitability scale
 
 - raster values are overlayed
 
-- each raster cells suitability value is multiplied by its layer weight (Tab.2) rasters value, and then sum of all cells are summed up as an output layer and final map. \footnote{https://www.esri.com/about/newsroom/wp-content/uploads/2019/05/understanding-weighted-overlay.pdf}
+- each raster cells suitability value is multiplied by its layer weight (Tab. 1) rasters value, and then sum of all cells are summed up as an output layer and final map. \footnote{https://www.esri.com/about/newsroom/wp-content/uploads/2019/05/understanding-weighted-overlay.pdf}
+\
+
+\setstretch{0.5}
+\small 
+| Layer	| Weight [%]	|
+|-----------------------------	|-------------------	|
+| **Fire hazards areas**	| 35	|
+| **Distance to existing stations**	| 25	|
+| **Buildings**	| 15 	|
+| **Population** |  15 |
+|	**Roads** | 5	|
+| **Student housing** |	5 |
+Table: Weights used in Weighted Overlay.
+\normalsize
+
+\setstretch{1.5}
 
 Since weighted overlay takes rasters data as an input, there were several operations conducted to obtain  6 input raster layers (Fig. 1). Workflow is presented on Fig. 2 and described in the next subsection. 
+\newpage 
 
-#### **Rasters reclassification**\
+#### **Rasters reclassifications**\
+
 *Fire hazard areas*
 
-Bergen is known from its wooden architecture it has to be the main factor in localization of new fire stations. It is known from the past that many fires (in 1955), have ravaged the characteristic wooden houses of Bryggen. The obtained data from geonorge.no presenting fire hazards objects in Bergen allowed to define euclidean distance from polygon layer and reclassified it to suitable classes. Areas within 2 km distance from fire hazards objects are considered as areas where we should consider to build new fire station unit.
+Since Bergen is the city that has many fire hazards areas (wooden buildings) it is decided that this factor has the highest weight in weighted overlay analysis (Table 5). The data related to fire hazards areas were used to define euclidean distance and then reclassified according to its importance (Table 4). It is decided that areas within 2 km from fire hazards objects are considered as factors that contribute to create new fire station, since fast reaction to fire events is important for this type of architecture. 
 
 *Existing fire stations*
 
-Since it is important that model is taking under consideration existing infrastructure, areas close to existing stations were reclassified (Tab. 1) according to calculated euclidean distance from fire station units. In the literature is is assumed that at a bare minimum, a fire station should be placed so that every part of the jurisdiction is within 5 miles (approx 8km) of a fire station and anything beyond 5 miles is considered as no recognized fire protection. \footnote{https://emergencyreporting.com/blog/evaluating-fire-station-locations/}. Bergen is a different city, and according to current measurements distances between fire stations are presented in Table 1. In this research the 3.5 distance is considered to have value 0 (it is not desired to build fire station there). 
+It is important that new model is taking under consideration existing infrastructure, thus euclidean distance from existing infrastructure was calculated and reclassified (Tab. 4 and 5). In the literature it is assumed that at a bare minimum, a fire station should be placed so that every part of the jurisdiction is within 5 miles ($\approx$ 8km) of a fire station and anything beyond 5 miles is considered as no recognized fire protection. \footnote{https://emergencyreporting.com/blog/evaluating-fire-station-locations/}. Bergen is a different city, and according to current measurements the minimum distance between fire stations is 2,4 km and the highest is 8,4 km (Table 1). Since it is different that approved convention the distance 3,5km has value 0 in reclassification process (not suitable are), $\leq$ 7 value 1, $\leq$ 10,5 value 2, and $\leq$ 14 value 3 (most suitable area). This layer is second important in WO with weight 25%.    
+
+\setstretch{0.5}
+\small 
 
 | Fire Station   	| Nearest Fire station 	| Distance [km] 	|
 |----------------	|----------------------	|---------------	|
@@ -116,32 +137,12 @@ Since it is important that model is taking under consideration existing infrastr
 
 Table: Distance to nearest fire station [km].
 
+\normalsize
+\setstretch{1.51}
+
 *Population and buildings* 
 
-```{r setup, echo=FALSE, results='show'}
-
-pop = read.table("BrannSta_250m_pop_buffer_2km_mean.txt", header = TRUE, sep = ";", dec = ",")
-data = read.table("data1.txt", header = TRUE, sep = ",", dec = ",")
-
-boliger = read.table("BrannSta_250m_boliger_buffer_2km_mean.txt", header = TRUE, sep = ";", dec = ",")
-
-pop_table = pop[, c(2,6)]
-pop_table$MEAN <- round(pop_table$MEAN)
-colnames(pop_table) <- c("Fire station", "Mean population")
-knitr::kable(head(pop_table), "simple", caption = "Mean population within 2km from Fire station.")
-
-boliger_table = boliger[, c(2,6)]
-boliger_table$MEAN <- round(boliger_table$MEAN)
-
-colnames(boliger_table) <- c("Fire station", "Mean number of buildings")
-knitr::kable(head(boliger_table), "simple",  caption = "Mean number of buildings within 2km from Fire station.")
-
-```
-
-
-Population and buildings layer are reclassified into 3 classes. They were divided according to the equal intervals. The higher values got higher significance in further analysis. This is confirmed by Fig. 1 and Table 1 and 2, where sum of population and buildings are summarized within 2 km distance from existing fire stations. It confirms as well that population and urban areas are important for fire station placement. These two layers have gotten the same weight since they are correlated and according to statistics,  human ignition is to blame for 84% of all wildfires (in USA), and 97% of all those that threaten homes. \footnote{https://www.science.org/content/article/human-sparked-wildfires-are-more-destructive-those-caused-nature}.  
-
-```{r fig-sub, echo = FALSE, fig.cap='Number of people and buildings from existing fire stations within 2km distance', fig.subcap=c('Population', 'Buildings'), out.width='.49\\linewidth', fig.asp=1, fig.ncol = 2}
+```{r fig-sub, echo = FALSE, fig.cap='Number of people and buildings from existing fire stations within 2km distance', fig.subcap=c('Population', 'Buildings'), out.width='.47\\linewidth', fig.asp=0.9, fig.ncol = 2}
 pop = read.table("BrannSta_250m_pop_buffer_2km_mean.txt", header = TRUE, sep = ";", dec = ",")
 data = read.table("data1.txt", header = TRUE, sep = ",", dec = ",")
 
@@ -156,14 +157,44 @@ barplot(boliger$MEAN, main='Number of buildings within 2km from Fire station',
 ```
 
 
-*Roads proximity*
+Table 2 presents sum of people and Table 3 sum of building defined by 2 km buffer from existing fire stations. We can conclude that existing fire stations are located close to high inhabited areas with high number of buildings. Thus population and buildings rasters are reclassified into 3 classes (to keep classes big enough). They were divided according to the equal intervals. The higher reclassification value the more people and more buildings are located there, thus the reclassified area is more important for fire station placement. This is presented on Figure 1 (a and b). The number of people (Fig.1 (a)) and buildings (Fig.1 (b)) are important and crucial in defining localization of new fire station unit. These two layers have gotten the same weight in WO and moreover,  according to statistics, human ignition is to blame for 84% of all wildfires (in USA), and 97% of all those that threaten homes. \footnote{https://www.science.org/content/article/human-sparked-wildfires-are-more-destructive-those-caused-nature}.  
 
-The distance to transport infrastructure is based as well on euclidean distance and has a value range from 0 to 1000 m that indicates distance values from the road segments in meters. It is assumed that up to 500m it is more suitable to build fire station (Tab. 1).
+\setstretch{0.5}
+\small 
+
+| Fire station   	| Sum   	|
+|----------------	|-------	|
+| Hovedstasjonen 	|  40570 	|
+| Arna           	| 5054  	|
+| Fana           	| 20580 	|
+| Laksevåg       	|| 12308 	|
+| Sandviken      	| 24356 	|
+| Åsane          	| 17716 	|
+
+Table: Sum of people living within 2km from existing fire stations.
+
+| Fire station   	| Sum 	|
+|----------------	|-----	|
+| Hovedstasjonen 	| 10  	|
+| Arna           	| 244 	|
+| Fana           	| 4   	|
+| Laksevåg       	| 258 	|
+| Sandviken      	| 577 	|
+| Åsane          	| 375 	|
+
+Table:  Sum of buildings living within 2km from exisiting fire station.
 
 \newpage
+\normalsize
+\setstretch{1.5}
+
+*Roads proximity*
+
+The distance to transport infrastructure is based as well on euclidean distance and has a value range from 0 to 1000m. It is assumed that up to 500m it is more suitable to build fire station (Tab. 4). Value are based on similar made by  Erden and Coskun (2010).
+
 *Student housing*
 
-It is commonly know that there are many fire alarms in student houses. This is happening often and according to own experience the fire station unit should be located in close distance. It is not the most important factor to get final result, but it should have had reflection in fire station placement localization. The euclidean distance from student houses is divided into two classes by manual interval (Tab 1). 
+Since there are many fire alarms (unfortunately false alarms, 38 in 2020 according to https://www.brannstatistikk.no/ at Fantoft) student houses location have to be considered. Nevertheless it is not the most important factor in WO, but it should have had some impact on fire station placement. The euclidean distance from student houses is divided into two classes by manual interval (Tab 4). 
 
 \setstretch{0.5}
 \small
@@ -202,18 +233,6 @@ Table: Reclassification values for raster layers.
 
 \newpage
 
-### Weights
-
-| Layer	| Weight [%]	|
-|-----------------------------	|-------------------	|
-| **Fire hazards areas**	| 35	|
-| **Distance to existing stations**	| 25	|
-| **Buildings**	| 15 	|
-| **Population** |  15 |
-|	**Roads** | 5	|
-| **Student housing** |	5 |
-Table: Weights used in Weighted Overlay.
-
 \begin{figure}
 \setstretch{0.5}
 \scriptsize
@@ -243,7 +262,7 @@ Table: Weights used in Weighted Overlay.
 
 
 
-4. Discussion
+# 4. Discussion
 \newpage 
 
 # References 
