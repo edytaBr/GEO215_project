@@ -7,8 +7,12 @@ title: |
   | *Multi Criteria Evaluation*
 author: |
         |
-        | Candidate no. 146
         |
+        | Candidate no. 146
+        | Exam: 3.12
+        |
+        | 
+        | 
         | ![](logo.png){width=1in}  
 
 date: "20/10/2021"
@@ -23,14 +27,13 @@ linestretch: 1.5
 geometry: margin=2.5cm
 
 ---
-\newpage 
-
+\newpage
 # 1. Introduction
 This analysis will consider the site selection for new fire station in Bergen. This is one of crucial question which decision makers have to answer due to potential risk of fires and its danger on society. In worst case scenario it can lead to loss of lives and properties and can lead to  state of emergency in the city. 
 
-This is one of the topic in emergency service location selection and there are many studies for selecting optimum location such as simple selections done in terms of rudimentary calculation, past experience, or even predilection. \footnote {https://www.isprs.org/proceedings/2011/gi4dm/pdf/op80.pdf}  
+This is one of the topic in emergency service location selection and there are many studies for selecting optimum location such as simple selections done in terms of rudimentary calculation, past experience, or even predilection.[@location_gis]}  
 
-In this assignment more sophisticated tools will be implemented, which make use of statistical and mathematical tools with accompany of Geographic Information Systems (GIS). This will help to produce suitability map to select preferable location/area to establish a new fire station in Bergen, Vestland. 
+In this assignment more sophisticated tools will be implemented, which make use of statistical and mathematical tools with accompany of Geographic Information Systems (GIS). This will help to produce suitability map to select preferable location/area to build a new fire station in Bergen, Vestland. 
 
 # 2. Methods and material
 
@@ -92,7 +95,7 @@ In this study the **Weighted Overlay** (WO) was used and its uses following step
 
 - raster values are overlayed
 
-- each raster cells suitability value is multiplied by its layer weight (Tab. 1) rasters value, and then sum of all cells are summed up as an output layer and final map. \footnote{https://www.esri.com/about/newsroom/wp-content/uploads/2019/05/understanding-weighted-overlay.pdf}
+- each raster cells suitability value is multiplied by its layer weight (Tab. 1) rasters value, and then sum of all cells are summed up as an output layer and final map[@weighted_overlay].
 \
 
 \setstretch{0.5}
@@ -121,7 +124,7 @@ Since Bergen is the city that has many fire hazards areas (wooden buildings) it 
 
 *Existing fire stations*
 
-It is important that new model is taking under consideration existing infrastructure, thus euclidean distance from existing infrastructure was calculated and reclassified (Tab. 4 and 5). In the literature it is assumed that at a bare minimum, a fire station should be placed so that every part of the jurisdiction is within 5 miles ($\approx$ 8km) of a fire station and anything beyond 5 miles is considered as no recognized fire protection. \footnote{https://emergencyreporting.com/blog/evaluating-fire-station-locations/}. Bergen is a different city, and according to current measurements the minimum distance between fire stations is 2,4 km and the highest is 8,4 km (Table 1). Since it is different that approved convention the distance 3,5km has value 0 in reclassification process (not suitable are), $\leq$ 7 value 1, $\leq$ 10,5 value 2, and $\leq$ 14 value 3 (most suitable area). This layer is second important in WO with weight 25%.    
+It is important that new model is taking under consideration existing infrastructure, thus euclidean distance from existing infrastructure was calculated and reclassified (Tab. 4 and 5). In the literature it is assumed that at a bare minimum, a fire station should be placed so that every part of the jurisdiction is within 5 miles ($\approx$ 8km) of a fire station and anything beyond 5 miles is considered as no recognized fire protection. [@evaluation_fire_station_loction]. Bergen is a different city, and according to current measurements the minimum distance between fire stations is 2,4 km and the highest is 8,4 km (Table 1). Since it is different that approved convention the distance 3,5km has value 0 in reclassification process (not suitable are), $\leq$ 7 value 1, $\leq$ 10,5 value 2, and $\leq$ 14 value 3 (most suitable area). This layer is second important in WO with weight 25%.    
 
 \setstretch{0.5}
 \small 
@@ -157,7 +160,7 @@ barplot(boliger$MEAN, main='Number of buildings within 2km from Fire station',
 ```
 
 
-Table 2 presents sum of people and Table 3 sum of building defined by 2 km buffer from existing fire stations. We can conclude that existing fire stations are located close to high inhabited areas with high number of buildings. Thus population and buildings rasters are reclassified into 3 classes (to keep classes big enough). They were divided according to the equal intervals. The higher reclassification value the more people and more buildings are located there, thus the reclassified area is more important for fire station placement. This is presented on Figure 1 (a and b). The number of people (Fig.1 (a)) and buildings (Fig.1 (b)) are important and crucial in defining localization of new fire station unit. These two layers have gotten the same weight in WO and moreover,  according to statistics, human ignition is to blame for 84% of all wildfires (in USA), and 97% of all those that threaten homes. \footnote{https://www.science.org/content/article/human-sparked-wildfires-are-more-destructive-those-caused-nature}.  
+Table 2 presents sum of people and Table 3 sum of building defined by 2 km buffer from existing fire stations. We can conclude that existing fire stations are located close to high inhabited areas with high number of buildings. Thus population and buildings rasters are reclassified into 3 classes (to keep classes big enough). They were divided according to the equal intervals. The higher reclassification value the more people and more buildings are located there, thus the reclassified area is more important for fire station placement. This is presented on Figure 1 (a and b). The number of people (Fig.1 (a)) and buildings (Fig.1 (b)) are important and crucial in defining localization of new fire station unit. These two layers have gotten the same weight in WO and moreover,  according to statistics, human ignition is to blame for 84% of all wildfires (in USA), and 97% of all those that threaten homes.[@fires_people]  
 
 \setstretch{0.5}
 \small 
@@ -182,7 +185,7 @@ Table: Sum of people living within 2km from existing fire stations.
 | Sandviken      	| 577 	|
 | Åsane          	| 375 	|
 
-Table:  Sum of buildings living within 2km from exisiting fire station.
+Table:  Sum of buildings living within 2km from existing fire station.
 
 \newpage
 \normalsize
@@ -231,7 +234,6 @@ Since there are many fire alarms (unfortunately false alarms, 38 in 2020 accordi
 | $\leq$ 31                	| 0                 	|
 Table: Reclassification values for raster layers.
 
-\newpage
 
 \begin{figure}
 \setstretch{0.5}
@@ -247,26 +249,28 @@ Table: Reclassification values for raster layers.
     \includegraphics[width=8cm,height = 7cm]{Layout_Student_housing_clip.png}
     \caption{Distance to student housing and distance to roads.}
 \end{figure}
-
-\normalsize
-\newpage 
+\vspace{-10cm}
 \begin{figure}
-\setstretch{0.5}
-    \includegraphics[keepaspectratio=false, width=14cm,height = 22cm]{Brann.png}
+    \includegraphics[keepaspectratio=false, width=14cm,height = 17cm]{Brann.png}
     \caption{Flowchart.}
 \end{figure}
-
 \newpage
+
 # 3. Results
+\begin{figure}
+    \includegraphics[keepaspectratio=false, width=16cm,height = 16cm]{Layout_final.png}
+    \caption{New fire station localization. Suitability map.}
+\end{figure}
+\setstretch{1.5}
 
-
-
+The final suitability map presents areas which are high suitable (Figure 6, orange areas) and Low suitable (blue). According to conducted calculations (Zonal geometry as table) suitable area stands for 4,8km (3% of total analysed area) and less suitable area stands for 150,75km (97%). According to the map, we can emphasize two main areas for new fir station locations. One is located in the city, second one is located in southern part of analysed area. First one is mainly determined due to high density of people and buildings as well as close proximity to fire hazards areas. Southern part of high suitable areas is determined mainly due to large distance from existing fire stations units. 
+In the city, according to manual measurements in ArcGis Pro distance between 3 cell localization and closest stations *Sandviken* is 570m  *Hovedstasjonen* and two other proposed localization is 1,8km and 2,3km. According to the Table 2 and common criteria it is too close to build new unit. We have to pay attention that this locations are influenced by factors mentioned above. Second southern area is more reasonable. Due to significantly, large distance to existing infrastructure, this area lacks in fire stations coverage. Probably today, it is not so dense inhabited area, and there are not so many buildings but as it is known, due to urban sprawl we can expect this is the future, thus it should be considered as place where new fire station can located.
 
 # 4. Discussion
-\newpage 
 
-# References 
-\newpage 
+\newpage
+
+
 
 
 
@@ -280,3 +284,6 @@ Table: Reclassification values for raster layers.
 
 
 \listoftables
+\listoffigures
+\newpage
+# Reference
