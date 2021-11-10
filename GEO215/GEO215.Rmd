@@ -28,6 +28,8 @@ geometry: margin=2.5cm
 
 ---
 \newpage
+\tableofcontents
+\newpage
 # 1. Introduction
 This analysis will consider the site selection for new fire station in Bergen. This is one of crucial question which decision makers have to answer due to potential risk of fires and its danger on society. In worst case scenario it can lead to loss of lives and properties and can lead to  state of emergency in the city. 
 
@@ -249,12 +251,16 @@ Table: Reclassification values for raster layers.
     \includegraphics[width=8cm,height = 7cm]{Layout_Student_housing_clip.png}
     \caption{Distance to student housing and distance to roads.}
 \end{figure}
-\vspace{-10cm}
+
+\newgeometry{left=2.5cm,right=2cm,top=1cm,bottom=2cm}
 \begin{figure}
-    \includegraphics[keepaspectratio=false, width=14cm,height = 17cm]{Brann.png}
+    \includegraphics[keepaspectratio=false, width=16cm,height = 22cm]{Brann.png}
     \caption{Flowchart.}
 \end{figure}
-\newpage
+\newpage\restoregeometry
+
+
+
 
 # 3. Results
 \begin{figure}
@@ -267,23 +273,16 @@ The final suitability map presents areas which are high suitable (Figure 6, oran
 In the city, according to manual measurements in ArcGis Pro distance between 3 cell localization and closest stations *Sandviken* is 570m  *Hovedstasjonen* and two other proposed localization is 1,8km and 2,3km. According to the Table 2 and common criteria it is too close to build new unit. We have to pay attention that this locations are influenced by factors mentioned above. Second southern area is more reasonable. Due to significantly, large distance to existing infrastructure, this area lacks in fire stations coverage. Probably today, it is not so dense inhabited area, and there are not so many buildings but as it is known, due to urban sprawl we can expect this is the future, thus it should be considered as place where new fire station can located.
 
 # 4. Discussion
+The number and location of fire station is the key in an efficient response during fire events. Multi-criteria evaluation takes under consideration many factors hence, we could include various data sets in study. Nevertheless, some data are not obtained from local authorities (like student housing) thus the data quality can be low.
+
+Since weighted overlay allows to specify importance of given factor by assigning weights it can provide reliable results. Concurrently, assigning weight to each layers can strongly influence our study. Here, weights were assigned mainly by intuition, and were not scaled by using more sophisticated methods.  It is common practice to use one of four different techniques when assigning the weights: ranking, rating, pairwise comparison, and trade of analysis [@weights]
+The cell size of grid (resolution) is 250m x 250m. This can lead that our analysis is too general. Due to this low spatial resolution it is hard to differentiate small structures, and details that can contribute to more accurate results. According to this, one of improvement that can be made in this study is to to decreased cell size and get more detailed information and crucial factor like `Anlegg med farlig stoff` from geonorge.no. 
+
+Finally, the suitability map from WO may shows sharper transition between two obtained 2 classes[@MCE]. However, it should not be interpreted as sites that are totally suitable and totally non-suitable sites. As it is described on the final map these two classes are areas with: high suitability and low suitability because we we cannot completely exclude "blue area" (Figure 6. )[@MCE]
+
 
 \newpage
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+\setstretch{1.45}
 \listoftables
 \listoffigures
-\newpage
 # Reference
